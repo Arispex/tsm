@@ -1,0 +1,11 @@
+:6213 {
+    handle /api* {
+        reverse_proxy http://tsm-backend:8080 {
+			header_up Host {http.reverse_proxy.upstream.hostport}
+		}
+    }
+
+    handle {
+        reverse_proxy http://tsm-frontend:3000
+    }
+}

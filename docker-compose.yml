@@ -1,0 +1,36 @@
+version: '3.5'
+
+services:
+  glances:
+    image: nicolargo/glances:latest-full
+    container_name: glances
+    ports:
+      - "61208:61208"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /run/user/1000/podman/podman.sock:/run/user/1000/podman/podman.sock
+    environment:
+      - "GLANCES_OPT=-w"
+    restart: unless-stopped
+  tsm-backend:
+    image: arispex/tsm-backend:0.0.1
+    container_name: tsm-backend
+    ports:
+        - "7777:7777"
+    depends_on:
+      - glances
+    restart: unless-stopped
+  tsm-frontend:
+    image: arispex/tsm-frontend:0.0.1
+    container_name: tsm-frontend
+    depends_on:
+        - tsm-backend
+    restart: unless-stopped
+  caddy:
+    image: caddy
+    container_name: caddy_server
+    ports:
+      - "6213:6213"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    restart: unless-stopped
